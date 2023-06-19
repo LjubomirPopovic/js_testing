@@ -63,4 +63,6 @@ module.exports = class HomePage extends BasePage {
     getOrderButton(packageDiv) {
         return packageDiv.findElement(By.className('btn btn-primary'));
     }
+
+
 }

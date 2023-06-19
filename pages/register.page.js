@@ -5,10 +5,6 @@ const BasePage = require('./base.page');
 
 module.exports = class RegisterPage extends BasePage {
 
-    getCurrentUrl() {
-        return this.driver().getCurrentUrl();
-    }
-
     getRegisterButton() {
         return this.driver().findElement(By.name('register'));
     }

@@ -8,6 +8,7 @@ const HomePage = require('../pages/home.page');
 const RegisterPage = require('../pages/register.page');
 const LoginPage = require('../pages/login.page');
 const CartPage = require('../pages/cart.page');
+const CheckoutPage = require('..//pages/checkout.page');
 
 describe('shop.qa.rs tests', function () {
     let driver;
@@ -15,6 +16,7 @@ describe('shop.qa.rs tests', function () {
     let pageRegister;
     let pageLogin;
     let pageCart;
+    let pageCheckout;
 
     const packageToAdd = 'starter';
     const packageQuantity = '2';
@@ -25,7 +27,8 @@ describe('shop.qa.rs tests', function () {
         pageRegister = new RegisterPage(driver);
         pageLogin = new LoginPage(driver);
         pageCart = new CartPage(driver);
-    });
+        pageCheckout = new CheckoutPage(driver);
+     });
 
     after(async function() {
         await driver.quit();
@@ -70,24 +73,30 @@ describe('shop.qa.rs tests', function () {
         expect(await pageHomePage.isLogoutLinkDisplayed()).to.be.true;
     });
 
+    it('Empty shopping cart', async function() {
+        await pageCart.clickEmptyShoppingCart();
+    })
+
     it('Adds item(s) to cart', async function() {
-       const packageDiv = await pageHomePage.getPackageDiv(packageToAdd);
-       const quantity = await pageHomePage.getQuantityDropdown(packageDiv);
-       const options = await pageHomePage.getQuantityOptions(quantity);
+        const packageDiv = await pageHomePage.getPackageDiv(packageToAdd);
+        const quantity = await pageHomePage.getQuantityDropdown(packageDiv);
+        const options = await pageHomePage.getQuantityOptions(quantity);
 
-       await Promise.all(options.map(async function(option) {
-           const text = await option.getText();
+        await Promise.all(options.map(async function (option) {
+            const text = await option.getText();
 
-           if (text === packageQuantity) {
-               await option.click();
+            if (text === packageQuantity) {
+                await option.click();
 
-               const selectedValue = await quantity.getAttribute('value');
-               expect(selectedValue).to.contain(packageQuantity);
+                const selectedValue = await quantity.getAttribute('value');
+                expect(selectedValue).to.contain(packageQuantity);
 
-               await pageHomePage.getOrderButton(packageDiv).click();
-               expect(await driver.getCurrentUrl()).to.contain('http://shop.qa.rs/order');
-           }
-       }))
+                await pageHomePage.getOrderButton(packageDiv).click();
+                expect(await driver.getCurrentUrl()).to.contain('http://shop.qa.rs/order');
+            }
+        }));
+            pageHomePage.goToPage();
+
     });
 
     it('Opens shopping cart', async function() {
@@ -95,6 +104,7 @@ describe('shop.qa.rs tests', function () {
 
         expect(await pageCart.getCurrentUrl()).to.be.eq('http://shop.qa.rs/cart');
         expect(await pageCart.getPageHeaderTitle()).to.contain('Order');
+
     });
 
     it('Verifies item(s) in cart', async function() {
@@ -102,6 +112,13 @@ describe('shop.qa.rs tests', function () {
         const orderQuantity = await pageCart.getOrderQuantity(orderRow);
 
         expect(await orderQuantity.getText()).to.eq(packageQuantity);
+    });
+
+    it('Performs checkout', async function() {
+        await pageCart.clickOnCheckoutButton();
+
+        expect(await pageCheckout.getCurrentUrl()).to.be.eq('http://shop.qa.rs/checkout');
+        expect(await pageCheckout.getPageTitle()).to.contain('You have successfully placed your order.');
     });
 
     it('Performs logout', async function() {

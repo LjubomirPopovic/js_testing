@@ -13,4 +13,17 @@ module.exports = class CartPage extends BasePage {
     getOrderQuantity(orderRow) {
         return orderRow.findElement(By.xpath('td[2]'));
     }
+
+    async clickEmptyShoppingCart() {
+        await this.driver().get('http://shop.qa.rs/cart/empty');
+    }
+
+    getCheckoutButton() {
+        return this.driver().findElement(By.name('checkout'));
+    }
+
+    async clickOnCheckoutButton() {
+        await this.getCheckoutButton().click();
+    }
+
 }
